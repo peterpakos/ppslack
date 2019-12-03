@@ -1,7 +1,7 @@
 # ppslack
 Tool to send messages via Slack
 
-PyPI package: [ppslack](https://pypi.python.org/pypi/ppslack)
+PyPI package: [ppslack](https://pypi.org/project/ppslack/)
 
 If you spot any problems or have any improvement ideas then feel free to open
 an issue and I will be glad to look into it for you.
