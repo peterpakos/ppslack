@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module implements sending messages via Slack
 
-Author: Peter Pakos <peter@pakos.uk>
-
-Copyright (C) 2019 Peter Pakos
+Copyright (c) 2019 Peter Pakos. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
