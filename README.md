@@ -4,7 +4,7 @@ Tool to send messages via Slack
 PyPI package: [ppslack](https://pypi.org/project/ppslack/)
 
 If you spot any problems or have any improvement ideas then feel free to open
-an issue and I will be glad to look into it for you.
+an issue. I will be glad to look into it for you.
 
 ## Installation
 The tool is available in PyPI and can be installed using pip:
@@ -30,8 +30,7 @@ email_domain=example.com
 ## Usage - Help
 ```
 $ ppslack --help
-usage: ppslack [--version] [--help] [--debug] [--verbose] [-f SENDER] -t RECIPIENTS [RECIPIENTS ...]
-               [-s SUBJECT] [-H]
+usage: ppslack [--version] [--help] [--debug] [--verbose] [-f SENDER] -t RECIPIENTS [RECIPIENTS ...] [-s SUBJECT] [-S] [-H]
 
 Tool to send messages via Slack
 
@@ -46,6 +45,7 @@ optional arguments:
                         recipient
   -s SUBJECT, --subject SUBJECT
                         subject
+  -S, --slack           Slack message (keeping for backward compatibility)
   -H, --code            send code block
 ```
 
