@@ -32,8 +32,19 @@ class Slack(object):
             self._config = Config('ppslack')
             self._slack_key = self._config.get('slack_key')
             self._email_domain = self._config.get('email_domain')
-        except Exception:
-            raise
+        except Exception as e:
+            log.debug(e)
+            try:
+                self._config = Config('ppmail')
+                self._slack_key = self._config.get('slack_key')
+                self._email_domain = self._config.get('email_domain')
+            except Exception as e:
+                log.debug(e)
+                raise Exception('Config file not found')
+            else:
+                log.debug('Config file found: ppmail')
+        else:
+            log.debug('Config file found: ppslack')
 
         self._client = WebClient(self._slack_key)
         self._users = {}
