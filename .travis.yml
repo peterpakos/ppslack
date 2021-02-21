@@ -1,7 +1,7 @@
-dist: xenial
-sudo: false
+os: linux
+dist: focal
 language: python
-matrix:
+jobs:
   include:
   - python: "3.7"
     env: TOXENV=py37
