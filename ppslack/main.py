@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool to send messages via Slack
 
-Copyright (c) 2019 Peter Pakos. All rights reserved.
+Copyright (c) 2019-2021 Peter Pakos. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function
+import argparse
+import os
+import platform
+import sys
+
+from pplogger import get_logger
+
 from . import __version__
 from .slack import Slack
 
-import os
-import sys
-import argparse
-import platform
-from pplogger import get_logger
-
-__app_name__ = os.path.splitext(__name__)[0].lower()
+__app_name__ = 'ppslack'
 
 parser = argparse.ArgumentParser(description='Tool to send messages via Slack', add_help=False)
 parser.add_argument('--version', action='version', version='%s %s' % (__app_name__, __version__))
@@ -38,6 +38,8 @@ parser.add_argument('-f', '--from', dest='sender',
                     help='sender')
 parser.add_argument('-t', '--to', dest='recipients', nargs='+', required=True, help='recipient', default=[])
 parser.add_argument('-s', '--subject', dest='subject', default='', help='subject')
+parser.add_argument('-S', '--slack', action='store_true', dest='slack',
+                    help='Slack message (keeping for backward compatibility)')
 parser.add_argument('-H', '--code', dest='code', action='store_true', help='send code block')
 args = parser.parse_args()
 
@@ -51,33 +53,26 @@ def main():
     log.debug('Sender: %s' % sender)
 
     message = ''
-    non_empty = 0
+    lines = 0
 
     for line in sys.stdin:
-        line = line
         message += line
         if line != '' and line != '\n':
-            non_empty += 1
+            lines += 1
 
-    if non_empty == 0:
+    if not lines:
         log.critical('Nothing to send')
-        exit(1)
+        sys.exit(1)
 
     try:
         slack = Slack()
+        slack.send(
+            sender=sender,
+            recipients=args.recipients,
+            subject=args.subject,
+            message=message,
+            code=args.code
+        )
     except Exception as e:
         log.critical(e)
-        exit(1)
-
-    status = slack.send(
-        sender=sender,
-        recipients=args.recipients,
-        subject=args.subject,
-        message=message,
-        code=args.code
-    )
-
-    if status:
-        exit()
-    else:
-        exit(1)
+        sys.exit(1)

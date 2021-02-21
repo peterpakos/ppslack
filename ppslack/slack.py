@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module implements sending messages via Slack
 
-Copyright (c) 2019 Peter Pakos. All rights reserved.
+Copyright (c) 2019-2021 Peter Pakos. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,32 +17,67 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function
-from ppconfig import Config
-
-import os
 import logging
-from slackclient import SlackClient
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+from ppconfig import Config
 
 log = logging.getLogger(__name__)
 
 
 class Slack(object):
     def __init__(self):
-        self._app_name = os.path.splitext(__name__)[0].lower()
-
         try:
-            self._config = Config(self._app_name)
-        except Exception:
-            raise
-
-        try:
+            self._config = Config('ppslack')
             self._slack_key = self._config.get('slack_key')
             self._email_domain = self._config.get('email_domain')
         except Exception:
             raise
 
-        self._slack_client = SlackClient(self._slack_key)
+        self._client = WebClient(self._slack_key)
+        self._users = {}
+        self._channels = {}
+
+    @property
+    def users(self):
+        if not self._users:
+            try:
+                r = self._client.users_list()
+            except SlackApiError:
+                raise
+
+            for user in r["members"]:
+                if not user['deleted'] and not user['is_bot'] and user['id'] != 'USLACKBOT':
+                    self._users[user['name']] = user
+
+            log.debug('Active members: %s' % len(self._users))
+
+        return self._users
+
+    def find_user_by_email(self, email):
+        for user in self.users.values():
+            if user['profile']['email'] == email:
+                log.debug('Found user with email %s: %s' % (email, user['name']))
+                return user
+
+        return
+
+    @property
+    def channels(self):
+        if not self._channels:
+            try:
+                r = self._client.conversations_list()
+            except SlackApiError:
+                raise
+
+            for channel in r['channels']:
+                if not channel['is_archived'] and not channel['is_private']:
+                    self._channels[channel['name']] = channel
+
+            log.debug('Public channels: %s' % len(self._channels))
+
+        return self._channels
 
     def send(self, sender, recipients, subject, message, code=False):
         if type(recipients) is not list:
@@ -68,22 +103,24 @@ class Slack(object):
             recipient_id = None
 
             if '@%s' % self._email_domain in recipient:
-                r = self._slack_client.api_call('users.lookupByEmail', email=recipient)
-                if r.get('ok'):
-                    recipient_id = r.get('user').get('id')
+                user = self.find_user_by_email(recipient)
+                if user:
+                    recipient_id = user['id']
             elif str(recipient).startswith('@'):
-                r = self._slack_client.api_call('users.lookupByEmail',
-                                                email=str(recipient).strip('@') + '@%s' % self._email_domain)
-                if r.get('ok'):
-                    recipient_id = r.get('user').get('id')
+                user = self.users[str(recipient).strip('@')]
+                if user:
+                    recipient_id = user['id']
             else:
-                if str(recipient).startswith('#'):
-                    recipient = str(recipient).lstrip('#')
-                recipient_id = self._find_channel_id(recipient)
+                if recipient in self.channels:
+                    channel = self.channels[recipient]
+                    recipient_id = channel['id']
+                elif recipient in self.users:
+                    user = self.users[recipient]
+                    recipient_id = user['id']
 
             if not recipient_id:
                 failed += 1
-                log.error('Slack user %s not found' % recipient)
+                log.error('User or channel %s not found' % recipient)
                 continue
 
             if code:
@@ -102,14 +139,15 @@ class Slack(object):
                         if not str(to_print).endswith('```'):
                             to_print = to_print + '```'
 
-                        r = self._slack_client.api_call(
-                            'chat.postMessage',
-                            username=sender,
-                            channel=recipient_id,
-                            text=to_print,
-                            as_user=False,
-                            link_names=True
-                        )
+                        try:
+                            r = self._client.chat_postMessage(
+                                channel=recipient_id,
+                                text=to_print,
+                                username=sender,
+                                link_names=True
+                            )
+                        except SlackApiError:
+                            raise
 
                         if not r.get('ok'):
                             failed += 1
@@ -117,35 +155,17 @@ class Slack(object):
                         to_print = []
                         length = 0
             else:
-                r = self._slack_client.api_call(
-                    'chat.postMessage',
-                    username=sender,
-                    channel=recipient_id,
-                    text=text,
-                    as_user=False,
-                    link_names=True
-                )
+                try:
+                    r = self._client.chat_postMessage(
+                        channel=recipient_id,
+                        text=text,
+                        username=sender,
+                        link_names=True
+                    )
+                except SlackApiError:
+                    raise
 
                 if not r.get('ok'):
                     failed += 1
 
         return False if failed else True
-
-    def _find_channel_id(self, channel):
-        r = self._slack_client.api_call('channels.list')
-        channels = r.get('channels')
-        for c in channels:
-            if c.get('name') == channel:
-                channel_id = c.get('id')
-                log.debug('Public channel name: %s, ID: %s' % (c.get('name'), c.get('id')))
-                return channel_id
-
-        r = self._slack_client.api_call('groups.list')
-        private_channels = r.get('groups')
-        for c in private_channels:
-            if c.get('name') == channel:
-                channel_id = c.get('id')
-                log.debug('Private channel name: %s, ID: %s' % (c.get('name'), c.get('id')))
-                return channel_id
-
-        return False
