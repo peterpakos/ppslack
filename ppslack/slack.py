@@ -78,7 +78,7 @@ class Slack(object):
     def channels(self):
         if not self._channels:
             try:
-                r = self._client.conversations_list()
+                r = self._client.conversations_list(limit=1000)
             except SlackApiError:
                 raise
 
