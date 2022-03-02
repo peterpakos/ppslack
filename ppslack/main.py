@@ -61,8 +61,8 @@ def main():
             lines += 1
 
     if not lines:
-        log.critical('Nothing to send')
-        sys.exit(1)
+        log.warn('Nothing to send')
+        sys.exit(0)
 
     try:
         slack = Slack()
