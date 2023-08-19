@@ -3,18 +3,17 @@ Tool to send messages via Slack
 
 PyPI package: [ppslack](https://pypi.org/project/ppslack/)
 
-If you spot any problems or have any improvement ideas then feel free to open
-an issue. I will be glad to look into it for you.
+If you spot a problem or have an improvement idea then feel free to open
+a [GitHub issue](https://github.com/peterpakos/ppslack/issues). I will be happy to look into it for you.
 
 ## Installation
-The tool is available in PyPI and can be installed using pip:
+The package is available in PyPI and can be installed using pip:
 ```
 $ pip install --user ppslack
 $ ppslack --help
 ```
 
-Once installed, a command line tool `ppslack` should be available in your
-system's PATH.
+Once installed, a command line tool `ppslack` will be available in your system's PATH.
 
 ## Configuration
 By default, the tool reads its configuration from `~/.config/ppslack` file (the

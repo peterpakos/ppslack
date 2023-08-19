@@ -1,0 +1,40 @@
+[project]
+name = "ppslack"
+authors = [
+  {name = "Peter Pakos", email = "peter@pakos.uk"},
+]
+description = "Tool to send messages via Slack"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["slack", "message", "notification", "notify"]
+license = {text = "GPLv3"}
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Topic :: Communications :: Chat"
+]
+dependencies = [
+  "pplogger",
+  "ppconfig",
+  "slack_sdk"
+]
+dynamic = ["version"]
+
+[project.urls]
+"GitHub" = "https://github.com/peterpakos/ppslack/"
+"PyPI" = "https://pypi.org/project/ppslack/"
+
+[project.scripts]
+ppslack = "ppslack.main:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "ppslack.__version__.__version__"}
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
