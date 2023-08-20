@@ -1,5 +1,5 @@
 # ppslack
-Tool to send messages via Slack
+Tool to send Slack messages
 
 PyPI package: [ppslack](https://pypi.org/project/ppslack/)
 
@@ -31,7 +31,7 @@ email_domain=example.com
 $ ppslack --help
 usage: ppslack [--version] [--help] [--debug] [--verbose] [-f SENDER] -t RECIPIENTS [RECIPIENTS ...] [-s SUBJECT] [-S] [-H]
 
-Tool to send messages via Slack
+Tool to send Slack messages
 
 optional arguments:
   --version             show program's version number and exit
