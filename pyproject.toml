@@ -3,7 +3,7 @@ name = "ppslack"
 authors = [
   {name = "Peter Pakos", email = "peter@pakos.uk"},
 ]
-description = "Tool to send messages via Slack"
+description = "Tool to send Slack messages"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["slack", "message", "notification", "notify"]
