@@ -75,4 +75,4 @@ def main():
         )
     except Exception as e:
         log.critical(e)
-        sys.exit(1)
+        sys.exit(0)
