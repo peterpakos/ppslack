@@ -26,7 +26,7 @@ from ppconfig import Config
 log = logging.getLogger(__name__)
 
 
-class Slack(object):
+class Slack:
     def __init__(self):
         try:
             self._config = Config('ppslack')
