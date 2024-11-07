@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module implements sending Slack messages
 
-Copyright (c) 2019-2023 Peter Pakos. All rights reserved.
+Copyright (c) 2019-2024 Peter Pakos. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
+
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-
 from ppconfig import Config
 
 log = logging.getLogger(__name__)
@@ -58,18 +58,18 @@ class Slack:
             except SlackApiError:
                 raise
 
-            for user in r["members"]:
+            for user in r['members']:
                 if not user['deleted'] and not user['is_bot'] and user['id'] != 'USLACKBOT':
                     self._users[user['name']] = user
 
-            log.debug('Active members: %s' % len(self._users))
+            log.debug(f'Active members: {len(self._users)}')
 
         return self._users
 
     def find_user_by_email(self, email):
         for user in self.users.values():
             if user['profile']['email'] == email:
-                log.debug('Found user with email %s: %s' % (email, user['name']))
+                log.debug(f'Found user with email {email}: {user["name"]}')
                 return user
 
         return
@@ -86,7 +86,7 @@ class Slack:
                 if not channel['is_archived'] and not channel['is_private']:
                     self._channels[channel['name']] = channel
 
-            log.debug('Public channels: %s' % len(self._channels))
+            log.debug(f'Public channels: {len(self._channels)}')
 
         return self._channels
 
@@ -98,22 +98,19 @@ class Slack:
             recipients = recipientsl
 
         if subject:
-            subject = '*%s*\n' % subject.strip()
+            subject = f'*{subject.strip()}*\n'
 
         if code:
-            message = "```%s```" % message
+            message = f'```{message}```'
 
-        text = '%s%s' % (subject, message)
-
-        if code:
-            text = text.splitlines(True)
+        text = f'{subject}{message}'
 
         failed = 0
 
         for recipient in recipients:
             recipient_id = None
 
-            if '@%s' % self._email_domain in recipient:
+            if f'@{self._email_domain}' in recipient:
                 user = self.find_user_by_email(recipient)
                 if user:
                     recipient_id = user['id']
@@ -131,10 +128,11 @@ class Slack:
 
             if not recipient_id:
                 failed += 1
-                log.error('User or channel %s not found' % recipient)
+                log.error(f'User or channel {recipient} not found')
                 continue
 
             if code:
+                text = text.splitlines(True)
                 to_print = []
                 length = 0
 
