@@ -29,11 +29,11 @@ email_domain=example.com
 ## Usage - Help
 ```
 $ ppslack --help
-usage: ppslack [--version] [--help] [--debug] [--verbose] [-f SENDER] -t RECIPIENTS [RECIPIENTS ...] [-s SUBJECT] [-S] [-H]
+usage: ppslack [--version] [--help] [--debug] [--verbose] [-f SENDER] -t RECIPIENTS [RECIPIENTS ...] [-s SUBJECT] [-H]
 
 Tool to send Slack messages
 
-optional arguments:
+options:
   --version             show program's version number and exit
   --help                show this help message and exit
   --debug               debugging mode
@@ -44,7 +44,6 @@ optional arguments:
                         recipient
   -s SUBJECT, --subject SUBJECT
                         subject
-  -S, --slack           Slack message (keeping for backward compatibility)
   -H, --code            send code block
 ```
 

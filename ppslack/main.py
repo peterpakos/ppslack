@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool to send Slack messages
 
-Copyright (c) 2019-2023 Peter Pakos. All rights reserved.
+Copyright (c) 2019-2024 Peter Pakos. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,23 +23,19 @@ import platform
 import sys
 
 from pplogger import get_logger
-
 from . import __version__
 from .slack import Slack
 
 __app_name__ = 'ppslack'
 
 parser = argparse.ArgumentParser(description='Tool to send Slack messages', add_help=False)
-parser.add_argument('--version', action='version', version='%s %s' % (__app_name__, __version__))
+parser.add_argument('--version', action='version', version=f'{__app_name__} {__version__}')
 parser.add_argument('--help', action='help', help='show this help message and exit')
 parser.add_argument('--debug', action='store_true', dest='debug', help='debugging mode')
 parser.add_argument('--verbose', action='store_true', dest='verbose', help='verbose debugging mode')
-parser.add_argument('-f', '--from', dest='sender',
-                    help='sender')
+parser.add_argument('-f', '--from', dest='sender', help='sender')
 parser.add_argument('-t', '--to', dest='recipients', nargs='+', required=True, help='recipient', default=[])
 parser.add_argument('-s', '--subject', dest='subject', default='', help='subject')
-parser.add_argument('-S', '--slack', action='store_true', dest='slack',
-                    help='Slack message (keeping for backward compatibility)')
 parser.add_argument('-H', '--code', dest='code', action='store_true', help='send code block')
 args = parser.parse_args()
 
@@ -50,7 +46,7 @@ def main():
     log.debug(args)
 
     sender = args.sender if args.sender else os.getenv('USER') + '@' + platform.node()
-    log.debug('Sender: %s' % sender)
+    log.debug(f'Sender: {sender}')
 
     message = ''
     lines = 0
